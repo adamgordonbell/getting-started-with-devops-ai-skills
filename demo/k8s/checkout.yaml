@@ -1,0 +1,49 @@
+# A workload that actually WORKS — busybox's built-in httpd serving one line —
+# so the demo cluster has a healthy service next to the crashlooping payments one.
+# It is the target of the chapter-10 "extract your own skill" beat: break-checkout.sh
+# puts a one-character typo in the Service selector, and the service goes dark while
+# every pod stays green. Same image as crashloop.yaml, so nothing new to pull.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout
+  namespace: demo
+  labels:
+    app.kubernetes.io/name: checkout
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: checkout
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: checkout
+    spec:
+      containers:
+        - name: checkout
+          image: busybox:1.36
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              mkdir -p /www
+              echo "checkout ok — $(hostname)" > /www/index.html
+              echo "[checkout] serving on :8080"
+              exec httpd -f -p 8080 -h /www
+          ports:
+            - containerPort: 8080
+          resources:
+            requests: { cpu: "10m", memory: "16Mi" }
+            limits:   { cpu: "50m", memory: "32Mi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: checkout
+  namespace: demo
+spec:
+  selector:
+    app.kubernetes.io/name: checkout
+  ports:
+    - port: 80
+      targetPort: 8080

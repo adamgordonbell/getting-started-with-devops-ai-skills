@@ -26,20 +26,29 @@
   },
 
   "postStartCommand": {
-    "fix-claude-perms": "sudo chown -R vscode:vscode /home/vscode/.claude || true"
+    "fix-claude-perms": "sudo chown -R vscode:vscode /home/vscode/.claude || true",
+    "seed-sessions": "bash -c 'sleep 2; bash .devcontainer/seed-sessions.sh \"$PWD\"' || true",
+    // setsid, so the daemon lands in its own session and outlives the exec that
+    // started it; absolute path, so it doesn't depend on PATH in a login shell.
+    "ccview": "bash -c 'pgrep -x ccview >/dev/null || { setsid nohup /go/bin/ccview >/tmp/ccview.log 2>&1 </dev/null & }; sleep 1; pgrep -x ccview >/dev/null && echo \"ccview up on ${CC_SERVE_PORT:-42425}\" || echo \"ccview FAILED — see /tmp/ccview.log\"' || true"
   },
 
   "postCreateCommand": "bash .devcontainer/post-create.sh ${containerWorkspaceFolder}",
 
-  "forwardPorts": [19999, 3030],
+  "forwardPorts": [19999, 3030, 42425],
   "portsAttributes": {
     "19999": { "label": "Claude Code OAuth" },
-    "3030": { "label": "Slidev deck" }
+    "3030": { "label": "Slidev deck" },
+    "42425": { "label": "ccview — Claude Code sessions" }
   },
   "otherPortsAttributes": { "onAutoForward": "silent" },
 
   "containerEnv": {
-    "NODE_OPTIONS": "--dns-result-order=ipv4first"
+    "NODE_OPTIONS": "--dns-result-order=ipv4first",
+    // 42425, not ccview's default 42424: a host may already run its own viewer
+    // there, and a colliding forward makes the statusline link open the host's
+    // sessions instead of this container's.
+    "CC_SERVE_PORT": "42425"
   },
 
   "remoteEnv": {

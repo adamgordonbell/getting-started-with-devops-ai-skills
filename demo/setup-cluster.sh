@@ -31,6 +31,9 @@ fi
 echo "==> applying the crashlooping 'payments' workload"
 kubectl apply -f "$HERE/k8s/crashloop.yaml"
 
+echo "==> applying the healthy 'checkout' workload (chapter 10 breaks this one)"
+kubectl apply -f "$HERE/k8s/checkout.yaml"
+
 echo "==> waiting a few seconds for it to crashloop..."
 sleep 8
 kubectl -n demo get pods -o wide || true

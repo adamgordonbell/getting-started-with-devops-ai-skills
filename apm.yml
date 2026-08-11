@@ -33,6 +33,12 @@ dependencies:
     - bregman-arie/devops-sre-skills/skills/kubernetes/diagnose-crashloop
     - bregman-arie/devops-sre-skills/skills/kubernetes/diagnose-imagepullbackoff
     - bregman-arie/devops-sre-skills/skills/kubernetes/triage-pending-pods
+    # Anthropic's skill-that-writes-skills — used live in chapter 10 to extract a new
+    # skill from a real Claude Code session (see demo/sessions/).
+    - anthropics/skills/skills/skill-creator
+    # OUR team's skills repo (chapter 10: build your own). New skills get extracted
+    # from real sessions, PR'd here, then land on every teammate's next `apm install`.
+    - adamgordonbell/devops-agent-skills/skills/cluster-health
 
   # Live tools, not static knowledge: the Pulumi MCP server lets the agent query the
   # registry, validate code, reach Pulumi Cloud, and delegate to Neo (chapter 03).

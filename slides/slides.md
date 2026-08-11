@@ -30,11 +30,11 @@ defaults:
 </div>
 
 <!--
-30s hook. Read the title, then the promise: your agent is smart but generic. It
-doesn't know your golden paths, your runbooks, your infra conventions. Agent Skills
-are how you teach it, small folders of instructions + scripts. Today we build a
-handful for DevOps, the way you'd build them at work. You leave able to turn any
-runbook into a skill.
+Goal:
+- using and finding skills
+- sharing skills ( apm )
+- building skills
+- runbook -> skill
 -->
 
 ---
@@ -61,9 +61,7 @@ runbook into a skill.
 </div>
 
 <!--
-I'm Engin, Senior Solutions Architect at Pulumi. I build platform tooling and help
-teams ship faster. I spend my days with both humans and AI agents writing infra. Today
-is about making those agents actually useful for DevOps work.
+- Engin built R1 · on chat today
 -->
 
 ---
@@ -89,21 +87,11 @@ is about making those agents actually useful for DevOps work.
   </div>
 </div>
 
-<!--
-~20s. And I'm Adam — Community Engineer at Pulumi and host of the CoRecursive podcast,
-telling the stories behind the code.
--->
-
 ---
 
 <div class="absolute inset-0 flex flex-col justify-center items-center px-20 text-center">
   <h1 class="!text-[6.5rem] !leading-tight !font-semibold !tracking-tight !m-0 !max-w-[95%]">Housekeeping & Agenda</h1>
 </div>
-
-<!--
-~20s. Two beats: housekeeping (how to follow along, where the code is) and the
-agenda (the arc of the workshop).
--->
 
 ---
 
@@ -124,10 +112,6 @@ agenda (the arc of the workshop).
 .zoom-content { zoom: 1.7; }
 </style>
 
-<!--
-~45s. Show-and-tell, not a lab. We drive; they watch and ask. Make the point that the
-repo is the takeaway, every demo is a folder they can work through at home.
--->
 
 
 ---
@@ -137,12 +121,12 @@ repo is the takeaway, every demo is a folder they can work through at home.
 <div class="zoom-content">
 
 <ul class="!mt-8 !text-[1.55rem] !leading-relaxed space-y-4">
-  <li>What an Agent Skill is, and why DevOps should use them</li>
-  <li>Find &amp; evaluate existing skills</li>
-  <li>Connect &amp; configure the agent: skills, MCP, LSP, hooks</li>
-  <li>Same prompt, configured vs not</li>
-  <li>Building complex skills safely</li>
-  <li>Design principles, maintenance &amp; removal</li>
+  <li><strong class="!text-[var(--p-primary)]">What</strong> — an Agent Skill, up close</li>
+  <li><strong class="!text-[var(--p-primary)]">Why</strong> — DevOps work is skill-shaped</li>
+  <li><strong class="!text-[var(--p-primary)]">Get</strong> — find &amp; evaluate existing skills</li>
+  <li><strong class="!text-[var(--p-primary)]">Wire</strong> — one manifest for the team: skills, MCP, LSP, hooks</li>
+  <li><strong class="!text-[var(--p-primary)]">Use</strong> — same prompt, configured vs not — live</li>
+  <li><strong class="!text-[var(--p-primary)]">Build</strong> — your own skills, done well</li>
 </ul>
 
 </div>
@@ -152,19 +136,17 @@ repo is the takeaway, every demo is a folder they can work through at home.
 </style>
 
 <!--
-~30s. Six beats. Don't read the sub-text, say the beat and move on. The arc:
-orient (what/why) → use what exists → configure → prove it → build safely → operate.
+- arc = using → sharing (apm) → building → runbook->skill
 -->
 
 ---
 
 <div class="absolute inset-0 flex flex-col justify-center items-center px-20 text-center">
-  <h1 class="!text-[6.5rem] !leading-tight !font-semibold !tracking-tight !m-0 !text-[var(--p-primary)] !max-w-[95%]">What is an Agent Skill?</h1>
+  <h1 class="!text-[7.5rem] !leading-tight !font-semibold !tracking-tight !m-0 !text-[var(--p-primary)]">What</h1>
+  <p class="!mt-4 !text-[2rem] text-[var(--p-fg-muted)] !m-0">an Agent Skill, up close</p>
 </div>
 
-<!--
-Section opener. ~3s. Then: the problem (generic agent), the fix (skills), the anatomy.
--->
+<StageMap current="what" />
 
 ---
 
@@ -189,12 +171,6 @@ Section opener. ~3s. Then: the problem (generic agent), the fix (skills), the an
 </p>
 
 </div>
-
-<!--
-~45s. The pain everyone in the room feels: the agent is generic, you re-paste your
-conventions every time. DevOps work is full of repeatable, high-stakes procedures.
-Skills turn "the thing in the wiki nobody reads" into something the agent executes.
--->
 
 ---
 
@@ -288,10 +264,207 @@ description: >-
 </style>
 
 <!--
-~70s. Show the format, then WHERE it lives. Frontmatter is the contract; the body is the
-procedure. Four homes: project (.claude/skills, commit to share), personal (~/.claude/skills),
-plugin (namespaced), and enterprise (managed, org-wide). When names collide, enterprise beats
-personal beats project. In this workshop, `apm install` writes them into .claude/skills for you.
+[USING]
+- frontmatter = contract · body = procedure
+- here: apm install writes these for you
+-->
+
+---
+
+# Frontmatter is a control panel
+
+<div class="grid grid-cols-2 gap-8 mt-2 items-start">
+  <div class="big-code">
+
+```yaml
+---
+name: deploy-service
+description: Deploy a service to production
+              # ← the trigger (default: Claude
+              #    fires it AND you get /deploy-service)
+
+disable-model-invocation: true
+              # ← only YOU: /deploy-service
+user-invocable: false
+              # ← or only CLAUDE (pick one)
+
+context: fork # ← runs in its own subagent,
+agent: Explore #   own context, reports back
+model: haiku  # ← cheap model for mechanical work
+
+allowed-tools: Read Grep Bash(kubectl get:*)
+              # ← least privilege, pre-approved
+---
+```
+
+  </div>
+  <div>
+    <p class="!text-[1.3rem] !leading-relaxed !mb-3">Who invokes it?</p>
+    <ul class="!text-[1.2rem] !leading-relaxed space-y-3">
+      <li v-click><strong>Default:</strong> both. Claude auto-triggers on the description; every skill is also a <code>/slash-command</code></li>
+      <li v-click><code>disable-model-invocation: true</code> → <span class="hl">you-only.</span> Right for anything that mutates: deploys, rollbacks, <code>pulumi up</code></li>
+      <li v-click><code>user-invocable: false</code> → <span class="hl">Claude-only.</span> Background knowledge, hidden from the <code>/</code> menu</li>
+      <li v-click><code>context: fork</code> → the skill runs in a <span class="hl">separate subagent</span>: doesn't fill your context, can use a different model, returns just the result</li>
+    </ul>
+  </div>
+</div>
+
+<style scoped>
+.big-code :deep(.slidev-code) {
+  font-size: 0.88rem !important;
+  line-height: 1.45 !important;
+  margin: 0 !important;
+  padding: 0.9rem 1.1rem;
+  border-radius: 12px;
+}
+</style>
+
+<!--
+[USING]
+- who fires it: default both · disable-model-invocation = you-only (mutations) · user-invocable:false = Claude-only
+- fork = own subagent: big noisy jobs (log sweeps, audits) don't eat your context
+-->
+
+---
+
+# Anatomy of a *complex* skill
+
+<div class="grid grid-cols-2 gap-10 mt-4">
+  <div class="big-code">
+
+```text
+incident-triage/
+├── SKILL.md            # the procedure, concise
+├── references/
+│   ├── severity-matrix.md
+│   └── escalation.md
+├── scripts/
+│   └── gather-diagnostics.sh
+└── templates/
+    └── postmortem.md
+```
+
+  </div>
+  <div>
+    <ul class="!mt-2 !text-[1.4rem] !leading-relaxed space-y-4">
+      <li><span class="hl">SKILL.md</span> stays short. It's what loads on trigger.</li>
+      <li><span class="hl">references/</span> hold the long detail, read only when needed.</li>
+      <li><span class="hl">scripts/</span> do the deterministic steps, so the model never re-derives a fragile command.</li>
+      <li><span class="hl">templates/</span> are the artifacts it fills in (a postmortem, a PR body).</li>
+    </ul>
+  </div>
+</div>
+
+<a href="https://github.com/adamgordonbell/devops-agent-skills/pull/1/changes#diff-b9c8fad0c741f0d1d84555217357a44e00726c4eda4b8d9fbf66065e798cfbfc" target="_blank" class="demo-band">
+  <span class="demo-chip">DEMO</span>
+  <span>a real one — <code>service-connectivity-triage</code>, a PR against our team skills repo →</span>
+</a>
+
+<style scoped>
+.demo-band {
+  margin-top: 2.8rem;
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  font-size: 1.6rem;
+  border: 1.5px solid rgba(126,107,255,0.45);
+  background: rgba(126,107,255,0.08);
+  border-radius: 14px;
+  padding: 1rem 1.4rem;
+  text-decoration: none;
+  color: var(--p-fg);
+}
+.demo-chip {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--p-primary);
+  border: 1.5px solid var(--p-primary);
+  border-radius: 8px;
+  padding: 0.15rem 0.7rem;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+</style>
+
+<!--
+- don't walk the bullets — click DEMO, walk the real folder in the PR
+- degrees of freedom: open field = prose · narrow bridge (db migration) = exact script
+-->
+
+---
+
+# Skills come from work you already did
+
+<div class="grid grid-cols-[1.4fr_1fr] gap-10 mt-4 items-start">
+  <div>
+    <ul class="!mt-2 !text-[1.45rem] !leading-relaxed space-y-4">
+      <li>Something broke. You and the agent dug through it. It's fixed.</li>
+      <li>That session <span class="hl">is the runbook</span> — the commands that worked, the dead ends, the tell that cracked it</li>
+      <li>Afterwards: reopen the session, extract the skill. Anthropic's <span class="hl"><code>skill-creator</code></span> does the drafting</li>
+      <li>PR it to the team repo → <code>apm install</code> ships it to <span class="hl">everyone's agent</span></li>
+    </ul>
+    <p class="!mt-8 !text-[1.5rem] !leading-relaxed">
+      <span class="hl">The best time to write a skill is right after you needed one.</span>
+    </p>
+  </div>
+  <div class="flex flex-col gap-5">
+    <div class="tool-card">
+      <div class="tool-card__text">
+        <div class="tool-card__name">cc-pick</div>
+        <div class="tool-card__desc">browse + resume past sessions, in the terminal</div>
+      </div>
+      <img src="/img/cc-pick-qr.png" alt="cc-pick QR" />
+    </div>
+    <div class="tool-card">
+      <div class="tool-card__text">
+        <div class="tool-card__name">ccview</div>
+        <div class="tool-card__desc">web viewer for session history</div>
+      </div>
+      <img src="/img/ccview-qr.png" alt="ccview QR" />
+    </div>
+    <div class="tool-card">
+      <div class="tool-card__text">
+        <div class="tool-card__name">skill-creator</div>
+        <div class="tool-card__desc">Anthropic's skill-that-writes-skills — <code>anthropics/skills</code> (in our apm.yml)</div>
+      </div>
+      <img src="/img/anthropic-skills-qr.png" alt="anthropics/skills QR" />
+    </div>
+  </div>
+</div>
+
+<style scoped>
+.tool-card {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  border: 1.5px solid var(--p-border);
+  background: var(--p-bg-elevated);
+  border-radius: 14px;
+  padding: 0.9rem 1.1rem;
+}
+.tool-card__text { flex: 1; }
+.tool-card__name {
+  font-family: var(--slidev-font-mono);
+  font-weight: 700;
+  font-size: 1.45rem;
+  color: var(--p-primary);
+}
+.tool-card__desc { font-size: 1.05rem; color: var(--p-fg-muted); line-height: 1.35; margin-top: 0.2rem; }
+.tool-card img {
+  width: 7rem;
+  height: 7rem;
+  background: #fff;
+  border-radius: 10px;
+  padding: 0.35rem;
+}
+</style>
+
+<!--
+BEAT 0 — jump to VS Code here:
+1. cc-pick → click through history → open the checkout session
+2. story: broke a Service, diagnosed with claude — pods green, endpoints empty, selector typo
+3. ccview: same session in the browser
+4. "I ran skill-creator on it" → that's the PR on the last slide
 -->
 
 ---
@@ -385,57 +558,11 @@ personal beats project. In this workshop, `apm install` writes them into .claude
 </style>
 
 <!--
-~60s. This is the unlock: three levels, cheap to expensive. Level 1 metadata is always in
-the prompt (a handful of tokens per skill). Level 2 body loads only when the skill triggers.
-Level 3 files load only when a step reaches for them. So dozens of skills cost almost nothing
-in context until used. Contrast with CLAUDE.md, which is always-on and bloats every request.
+- contrast: CLAUDE.md = always-on, bloats every request
 -->
 
 ---
-
-# Anatomy of a *complex* skill
-
-<div class="grid grid-cols-2 gap-10 mt-4">
-  <div class="big-code">
-
-```text
-incident-triage/
-├── SKILL.md            # the procedure, concise
-├── references/
-│   ├── severity-matrix.md
-│   └── escalation.md
-├── scripts/
-│   └── gather-diagnostics.sh
-└── templates/
-    └── postmortem.md
-```
-
-  </div>
-  <div>
-    <ul class="!mt-2 !text-[1.4rem] !leading-relaxed space-y-4">
-      <li v-click><span class="hl">SKILL.md</span> stays short. It's what loads on trigger.</li>
-      <li v-click><span class="hl">references/</span> hold the long detail, read only when needed.</li>
-      <li v-click><span class="hl">scripts/</span> do the deterministic steps, so the model never re-derives a fragile command.</li>
-      <li v-click><span class="hl">templates/</span> are the artifacts it fills in (a postmortem, a PR body).</li>
-    </ul>
-  </div>
-</div>
-
-<p v-click class="!mt-9 !text-[2rem] !leading-relaxed text-left !max-w-[95%]">
-  <span class="hl">Match freedom to fragility:</span> judgement calls stay in prose; fragile,
-  must-be-exact steps become a <span class="hl">script the agent just runs</span>. Anthropic
-  calls this <em>degrees of freedom</em>.
-</p>
-
-<!--
-~60s. The "makeup of a skill." Reveal each part on click. The body points at the bundled
-files ("to classify severity, read references/severity-matrix.md"), lazy-loaded. Land the
-last line, which is Anthropic's real "degrees of freedom" principle: match specificity to a
-task's fragility. Open field (many paths) = prose/high freedom; narrow bridge (one safe way,
-e.g. a db migration) = an exact script/low freedom. Scripts also keep it deterministic and
-save tokens (the code never enters context).
--->
-
+hide: true
 ---
 
 # Skill ≠ MCP ≠ CLAUDE.md
@@ -461,23 +588,14 @@ save tokens (the code never enters context).
   at the skills your repo expects. Best results use all three.
 </p>
 
-<!--
-~60s. Clear up the confusion before it derails the room. Reveal one card per click:
-Skill = how-to (on demand). MCP = tools/live data (a server). CLAUDE.md = always-on rules.
-Then the composed payoff: they're complementary; the Pulumi skills literally teach the
-agent how to drive the Pulumi MCP server.
--->
-
 ---
 
 <div class="absolute inset-0 flex flex-col justify-center items-center px-20 text-center">
-  <h1 class="!text-[6rem] !leading-tight !font-semibold !tracking-tight !m-0 !text-[var(--p-primary)] !max-w-[95%]">Why DevOps should use skills too</h1>
+  <h1 class="!text-[7.5rem] !leading-tight !font-semibold !tracking-tight !m-0 !text-[var(--p-primary)]">Why</h1>
+  <p class="!mt-4 !text-[2rem] text-[var(--p-fg-muted)] !m-0">DevOps work is skill-shaped</p>
 </div>
 
-<!--
-Pivot to the DevOps angle, echoing the agenda line. The job is repeatable judgement, the
-exact shape of a skill. This is where the room leans in: their runbooks, encoded.
--->
+<StageMap current="why" />
 
 ---
 
@@ -504,10 +622,7 @@ exact shape of a skill. This is where the room leans in: their runbooks, encoded
 </div>
 
 <!--
-~50s. The Pulumi quote is the thesis. Then the list, every one is a runbook that exists
-in someone's head or a stale wiki. The Joe Duffy stat (May '26 release; a vendor forecast,
-attribute it if challenged) lands the urgency:
-the agent is already deploying infra; skills decide whether it does it your way.
+- 20% stat = Joe Duffy, May '26 — vendor forecast, attribute if challenged
 -->
 
 ---
@@ -541,22 +656,15 @@ the agent is already deploying infra; skills decide whether it does it your way.
   Datadog), and the agent <span class="hl">orchestrates</span>.
 </p>
 
-<!--
-~60s. Left/right before-after, one card per click. The payoff line: senior-engineer
-judgement encoded once, distributed to every engineer's agent. Land the "skills + MCP +
-agent" division of labor, it frames the whole rest of the workshop.
--->
-
 ---
 
 <div class="absolute inset-0 flex flex-col justify-center items-center px-20 text-center">
-  <h1 class="!text-[6rem] !leading-tight !font-semibold !tracking-tight !m-0 !text-[var(--p-primary)] !max-w-[95%]">Find &amp; evaluate skills</h1>
+  <h1 class="!text-[7.5rem] !leading-tight !font-semibold !tracking-tight !m-0 !text-[var(--p-primary)]">Get</h1>
+  <p class="!mt-4 !text-[2rem] text-[var(--p-fg-muted)] !m-0">find &amp; evaluate existing skills</p>
 </div>
 
-<!--
-Section divider. Don't write what you can adopt. Then: where to look, and how to vet a
-skill that's going to touch your infrastructure. (APM + Pulumi catalogue slides follow.)
--->
+<StageMap current="get" />
+
 
 
 ---
@@ -586,9 +694,8 @@ npx skills find kubernetes
 </div>
 
 <!--
-~60s. Start by NOT writing. Point at the four sources. The fastest skill is one that's
-already debugged in someone else's prod. Aside if asked: there is NO get.pulumi.com/skills.sh
-(it 403s); the real install is the npx skills CLI / the Claude Code marketplace, and APM on top.
+[USING]
+- if asked: NO get.pulumi.com/skills.sh (403s) — real path = npx skills / marketplace / APM
 -->
 
 ---
@@ -615,21 +722,14 @@ already debugged in someone else's prod. Aside if asked: there is NO get.pulumi.
   <p>Read the whole <code>SKILL.md</code> and every script it bundles before you enable it. <strong>If you wouldn't merge it as a PR, don't install it as a skill.</strong></p>
 </aside>
 
-<!--
-~60s. Six questions. The one that matters most for DevOps: "what can it run", a
-write-capable skill is a supply-chain surface. The rule of thumb is the takeaway line.
--->
-
 ---
 
 <div class="absolute inset-0 flex flex-col justify-center items-center px-20 text-center">
-  <h1 class="!text-[6rem] !leading-tight !font-semibold !tracking-tight !m-0 !text-[var(--p-primary)] !max-w-[95%]">Connect, configure &amp; use</h1>
+  <h1 class="!text-[7.5rem] !leading-tight !font-semibold !tracking-tight !m-0 !text-[var(--p-primary)]">Wire</h1>
+  <p class="!mt-4 !text-[2rem] text-[var(--p-fg-muted)] !m-0">one manifest for the whole team — APM</p>
 </div>
 
-<!--
-Section divider. Install a skill, then watch the agent use it inside a real task. This is
-where APM enters, the manifest that makes installs reproducible for the whole team.
--->
+<StageMap current="wire" />
 
 ---
 
@@ -675,11 +775,6 @@ npx skills add pulumi/agent-skills \
 }
 </style>
 
-<!--
-~60s. Two real install paths. Both work, both are per-machine. The info-card sets up the
-gap APM fills: there's no shared manifest, so nothing is reproducible across the team.
--->
-
 ---
 
 # APM: package.json for your agent
@@ -705,12 +800,39 @@ gap APM fills: there's no shared manifest, so nothing is reproducible across the
 
 </div>
 
+<div v-click class="demo-band">
+  <span class="demo-chip">DEMO</span>
+  <span>run it — <code>apm install</code>, then what landed in <code>.claude/</code></span>
+</div>
+
 <div class="apm-qr">
   <img src="/img/apm-repo-qr.png" alt="microsoft/apm on GitHub" />
   <div class="apm-qr__label">github.com/microsoft/apm</div>
 </div>
 
 <style scoped>
+.demo-band {
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  font-size: 1.5rem;
+  max-width: 68%;
+  border: 1.5px solid rgba(126,107,255,0.45);
+  background: rgba(126,107,255,0.08);
+  border-radius: 14px;
+  padding: 0.8rem 1.3rem;
+}
+.demo-chip {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--p-primary);
+  border: 1.5px solid var(--p-primary);
+  border-radius: 8px;
+  padding: 0.15rem 0.7rem;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
 .apm-qr {
   position: absolute;
   bottom: 2.5rem;
@@ -738,10 +860,11 @@ gap APM fills: there's no shared manifest, so nothing is reproducible across the
 </style>
 
 <!--
-~60s. The thesis of the "build on APM" choice. npx skills = imperative, per-machine. APM =
-declarative, reproducible, multi-harness, like going from "curl | sh" to a lockfile.
-The security angle (hidden-Unicode scan, pinned hashes) matters for skills that run code.
-QR bottom-right goes to github.com/microsoft/apm.
+[SHARING] BEAT 1 launches here — final click reveals DEMO:
+1. apm.yml in editor (3 dep kinds + hooks file-discovered)
+2. apm install (prewarmed, fast)
+3. ls .claude/skills/ · .lsp.json · hook in settings.json
+- analogy: curl|sh → lockfile
 -->
 
 ---
@@ -754,34 +877,30 @@ name: getting-started-with-devops-ai-skills
 targets: [claude]            # also: copilot, cursor, codex, gemini, …
 dependencies:
   apm:
-    - pulumi/agent-skills/pulumi          # Pulumi's core skill set (7 skills)
+    - pulumi/agent-skills/pulumi          # Pulumi's core skill set
     - pulumi/agent-skills/delegation      # pulumi-neo-handoff
-    # a community runbook (path resolves to a SKILL.md):
     - bregman-arie/devops-sre-skills/skills/kubernetes/diagnose-crashloop
   mcp:
-    - name: pulumi                        # Pulumi's hosted MCP server (OAuth on first use)
-      registry: false
+    - name: pulumi                        # hosted MCP server (OAuth on first use)
       transport: http
       url: https://mcp.ai.pulumi.com/mcp
   # lsp: language servers (next slide) · hooks live in .apm/hooks/
 ```
 
-<div class="grid grid-cols-3 gap-5 mt-5">
-  <div v-click class="gpu-card gpu-card--muted"><div class="gpu-caption gpu-caption--muted">apm install</div><p class="!mt-2 !text-[1.05rem]">Resolve + scan, then integrate it all into <code>.claude/</code>: skills, hooks, LSP, MCP.</p></div>
-  <div v-click class="gpu-card gpu-card--muted"><div class="gpu-caption gpu-caption--muted">commit apm.lock.yaml</div><p class="!mt-2 !text-[1.05rem]">Pins exact versions and content hashes, the same for everyone.</p></div>
-  <div v-click class="gpu-card gpu-card--muted"><div class="gpu-caption gpu-caption--muted">git clone &amp;&amp; apm install</div><p class="!mt-2 !text-[1.05rem]">A new teammate is fully configured in one command.</p></div>
+<div class="grid grid-cols-3 gap-4 mt-4">
+  <div v-click class="gpu-card gpu-card--muted"><div class="gpu-caption gpu-caption--muted">apm install</div><p class="!mt-2 !text-[0.98rem]">Resolve + scan, then integrate it all into <code>.claude/</code>: skills, hooks, LSP, MCP.</p></div>
+  <div v-click class="gpu-card gpu-card--muted"><div class="gpu-caption gpu-caption--muted">commit apm.lock.yaml</div><p class="!mt-2 !text-[0.98rem]">Pins exact versions and content hashes, the same for everyone.</p></div>
+  <div v-click class="gpu-card gpu-card--muted"><div class="gpu-caption gpu-caption--muted">git clone &amp;&amp; apm install</div><p class="!mt-2 !text-[0.98rem]">A new teammate is fully configured in one command.</p></div>
 </div>
 
 <style scoped>
-:deep(.slidev-code) { font-size: 1.05rem !important; line-height: 1.5 !important; max-width: 96%; margin: 0.3rem 0 0; padding: 0.9rem 1.3rem; border-radius: 12px; }
+:deep(.slidev-code) { font-size: 0.95rem !important; line-height: 1.45 !important; max-width: 96%; margin: 0.3rem 0 0; padding: 0.8rem 1.2rem; border-radius: 12px; }
 </style>
 
 <!--
-~75s. This is OUR apm.yml. Walk the deps: Pulumi skills, community runbooks, the Pulumi MCP
-server (and LSP servers, next slides). The key command is `apm install`: it does everything,
-integrating skills, hooks, LSP, and MCP into .claude/ and writing apm.lock.yaml. Commit the
-lockfile; a teammate just clones and runs apm install. (`apm compile` is a separate thing:
-it turns .apm/ instructions into AGENTS.md/CLAUDE.md, which this workshop doesn't use.)
+[SHARING] DEBRIEF of beat 1 — they just watched apm install run; this is the manifest
+that drove it. Walk the deps, then click the three cards.
+- if asked: apm compile = separate (.apm/ → AGENTS.md), not used here
 -->
 
 ---
@@ -809,10 +928,7 @@ it turns .apm/ instructions into AGENTS.md/CLAUDE.md, which this workshop doesn'
 </p>
 
 <!--
-~60s. The Pulumi-specific stack. Skills = knowledge, MCP = governed live access, Neo =
-autonomous execution with governance. The handoff skill is the bridge. Don't oversell Neo:
-today we only show the pulumi-neo-handoff skill, not a live Neo run — don't claim
-"autonomous incident resolution" from a slide.
+- don't oversell Neo — we show the handoff skill only, no live Neo run
 -->
 
 ---
@@ -838,14 +954,6 @@ today we only show the pulumi-neo-handoff skill, not a live Neo run — don't cl
 </p>
 
 </div>
-
-<!--
-~45s. The teaser thesis, said plainly: the agent is only as good as its config. Skills +
-MCP were levers one and two. Now the two that guard against drift: LSP (it sees real types)
-and hooks/permissions (local guardrails). Both are wired by the same `apm install`: LSP from
-apm.yml (dependencies.lsp), hooks file-discovered from .apm/hooks/. Be honest that hooks are
-a nudge, not a wall; real enforcement is server-side (Pulumi Cloud policy), covered next.
--->
 
 ---
 
@@ -886,12 +994,6 @@ dependencies:
 <style scoped>
 :deep(.slidev-code) { font-size: 1.0rem !important; line-height: 1.45 !important; }
 </style>
-
-<!--
-~75s. The "see real types" win. Without LSP the agent guesses cloud-SDK signatures and
-hallucinates. With it, it gets the same red squiggles you do. APM only writes the config
-(.lsp.json); you still install the server binaries yourself. Tracked in apm.lock.yaml.
--->
 
 ---
 
@@ -938,12 +1040,18 @@ hallucinates. With it, it gets the same red squiggles you do. APM only writes th
 </style>
 
 <!--
-~75s. Be honest here or a sharp attendee will catch you. The hook is real and useful: it
-catches `pulumi up`/`destroy` on the Bash tool (flags and all) and fails closed. But it's a
-NUDGE: the agent can deploy through the Automation API skill or the MCP server (no Bash),
-wrap it in `make deploy`, or edit settings.json with the Write tool. Say that out loud, then
-point at the real enforcement: Pulumi Cloud deployment policy + OIDC creds, server-side.
+- eager-agent story: R1 + my rehearsal — agent found the broken crashloop yaml and FIXED it unprompted
+- that's why: nudge not wall · real wall = Cloud policy + OIDC
 -->
+
+---
+
+<div class="absolute inset-0 flex flex-col justify-center items-center px-20 text-center">
+  <h1 class="!text-[7.5rem] !leading-tight !font-semibold !tracking-tight !m-0 !text-[var(--p-primary)]">Use</h1>
+  <p class="!mt-4 !text-[2rem] text-[var(--p-fg-muted)] !m-0">the configured agent, at work</p>
+</div>
+
+<StageMap current="use" />
 
 ---
 
@@ -978,17 +1086,44 @@ new aws.s3.BucketV2("data", {
   </div>
 </div>
 
+<div v-click class="demo-band">
+  <span class="demo-chip">DEMO</span>
+  <span>for real — the squiggle, the skill firing itself, the hook holding <code>pulumi up</code></span>
+</div>
+
 <style scoped>
 :deep(.slidev-code) { font-size: 0.95rem !important; line-height: 1.4 !important; }
+.demo-band {
+  margin-top: 1.8rem;
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  font-size: 1.5rem;
+  border: 1.5px solid rgba(126,107,255,0.45);
+  background: rgba(126,107,255,0.08);
+  border-radius: 14px;
+  padding: 0.8rem 1.3rem;
+}
+.demo-chip {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--p-primary);
+  border: 1.5px solid var(--p-primary);
+  border-radius: 8px;
+  padding: 0.15rem 0.7rem;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
 </style>
 
 <!--
-~90s. THE money shot (PRESENTER.md protects this demo above all). Don't just assert config
-helps; show it. Naked: invents `publicReadAccess`, skips preview. Configured: LSP flags the
-arg in-editor, the golden-path skill adds standard tags, the hook stops `pulumi up`. This
-exact scenario runs LIVE in the demo block at the end (demo/pulumi-ts ships the red squiggle
-on publicReadAccess ready to show) — promise it here, don't run it now. If only one demo
-survives the clock, it's this one.
+BEAT 2 — the money shot. Three artifacts IN ORDER, narrate off vs on:
+1. LSP: open demo/pulumi-ts/index.ts → red squiggle on publicReadAccess
+2. skill: "Start a new payments service — AWS, TypeScript" → golden-path fires itself
+   — land it: you never SAID "use the skill"
+3. hook: ask it to apply → guard-pulumi.sh blocks pulumi up, preview still green
+- say it: hook = nudge not wall
+- if only one demo survives the clock: this one
 -->
 
 ---
@@ -1018,18 +1153,49 @@ survives the clock, it's this one.
   </div>
 </div>
 
+<div v-click class="demo-band">
+  <span class="demo-chip">DEMO</span>
+  <span>…and now that <code>payments</code> service is crashlooping — <code>incident-triage</code>, live</span>
+</div>
+
 <style scoped>
 .pr-card { max-width: 100%; margin: 0; border: 1px solid rgba(126,107,255,0.4); border-radius: 12px; background: rgba(126,107,255,0.06); }
 .pr-card__body { padding: 0.9rem 1.2rem; font-size: 1.3rem; }
 :deep(.slidev-code) { font-size: 1.1rem !important; line-height: 1.5 !important; }
+.demo-band {
+  margin-top: 1.8rem;
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  font-size: 1.5rem;
+  border: 1.5px solid rgba(126,107,255,0.45);
+  background: rgba(126,107,255,0.08);
+  border-radius: 14px;
+  padding: 0.8rem 1.3rem;
+}
+.demo-chip {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--p-primary);
+  border: 1.5px solid var(--p-primary);
+  border-radius: 8px;
+  padding: 0.15rem 0.7rem;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
 </style>
 
 <!--
-~60s. The magic moment: you didn't say "use the skill." The agent matched your plain
-request to the skill's description and ran it, with the safety defaults baked in
-(preview, no unprompted up). That's the whole value: your playbook, automatically.
+- DEBRIEF of beat 2 first: matched from description alone · ESC/OIDC wired · stopped at preview
+- then final click = BEAT 3. Prompt EXACTLY: "We have a prod incident: the payments pods
+  are in CrashLoopBackOff in the demo namespace. Triage it — gather diagnostics, classify
+  severity, and propose a stabilization plan." (bare "triage this crashloop" → community skill)
+- watch: fires from description · gather-diagnostics.sh read-only · severity from references/
+  · proposes fix, STOPS
 -->
 
+---
+hide: true
 ---
 
 # Complex: make it safe and deterministic
@@ -1065,12 +1231,16 @@ scripts/gather-diagnostics.sh <ns> <workload>
   </div>
 </div>
 
-<!--
-~75s. Builds on the anatomy slide, now the FOCUS is safety + determinism. Land two things:
-the read-only frontmatter guardrail, and "the deterministic step is a script, not prose." Same
-pattern as Anthropic's skill-creator and the community devops-sre-skills runbooks.
--->
 
+
+---
+
+<div class="absolute inset-0 flex flex-col justify-center items-center px-20 text-center">
+  <h1 class="!text-[7.5rem] !leading-tight !font-semibold !tracking-tight !m-0 !text-[var(--p-primary)]">Build</h1>
+  <p class="!mt-4 !text-[2rem] text-[var(--p-fg-muted)] !m-0">your own skills, done well</p>
+</div>
+
+<StageMap current="build" />
 
 ---
 
@@ -1095,8 +1265,8 @@ pattern as Anthropic's skill-creator and the community devops-sre-skills runbook
 </style>
 
 <!--
-~75s. The design-principles lesson. Don't read all six, land #1 (description = trigger)
-and #6 (safe by default), the two that matter most for DevOps. The rest are on the slide.
+[BUILDING]
+- don't read all six — land #1 + #6
 -->
 
 ---
@@ -1125,33 +1295,37 @@ and #6 (safe by default), the two that matter most for DevOps. The rest are on t
 </div>
 
 <!--
-~75s. Two lessons in one. Left: maintenance, the killer line is "stale skill is worse than
-a stale doc because the agent acts on it." Right: removal, prune for context + mis-trigger
-hygiene; disable when unsure. The course's 01_09e branch literally ends empty.
+- killer line: stale skill > stale doc — the agent ACTS on it
 -->
 
 ---
 
-# What you've got now
+# One loop, closed today
 
 <div class="zoom-content">
 
 <ul class="!mt-6 !text-[1.45rem] !leading-relaxed space-y-4">
-  <li v-click>A skill is a <span class="hl">folder + SKILL.md</span>; the description is the trigger; progressive disclosure keeps it cheap</li>
-  <li v-click><span class="hl">Adopt before you build</span>, and read the scripts before you trust them</li>
-  <li v-click><span class="hl">APM</span> makes installs reproducible for the whole team; <span class="hl">Pulumi skills + MCP + Neo</span> handle the actual Pulumi work</li>
-  <li v-click>Your <span class="hl">runbooks</span> are skills waiting to be built. Capture the next one you do twice.</li>
+  <li v-click>An <span class="hl">incident</span>: checkout dark, every pod green — nothing any installed skill covered</li>
+  <li v-click>The debugging <span class="hl">session became a skill</span>: <code>skill-creator</code> extracted <code>service-connectivity-triage</code></li>
+  <li v-click>The skill became <span class="hl">PR #1</span> on our team repo — reviewed like code</li>
+  <li v-click>Merged → one line in <code>apm.yml</code> → next <code>apm install</code>: it's in <span class="hl">every teammate's agent</span>, pinned</li>
 </ul>
+
+<p v-click class="!mt-8 !text-[1.5rem] !leading-relaxed">
+  <span class="hl">incident → session → skill → PR → review → team.</span><br/>
+  Your runbooks are skills waiting to be built — capture the next one you do twice.
+</p>
 
 </div>
 
 <style scoped>
-.zoom-content { zoom: 1.25; }
+.zoom-content { zoom: 1.15; }
 </style>
 
 <!--
-~45s. Four takeaways = the spine of the workshop. End on the call to action: the next
-runbook you do twice, make it a skill. Everything's in the repo.
+- the whole workshop in one arc: what (a folder) · why (this job) · get (we adopted 14)
+  · wire (the manifest) · use (you watched it) · build (this loop)
+- merge + dep line: spoken, not performed — one click, verified working Aug 10
 -->
 
 ---
@@ -1175,27 +1349,9 @@ runbook you do twice, make it a skill. Everything's in the repo.
 </p>
 
 <!--
-~60s. Honest close: two things worth your evenings. (1) Skill EVALS: skill-creator has
-Create/Eval/Improve/Benchmark modes; a test case pairs a realistic prompt with assertions;
-benchmarks track pass rate, time, tokens; blind A/B compares skill vs no-skill so you know
-it actually helps. (2) Governance at org scale. The kicker: models ship constantly, and each
-one can change skill behavior. Capability skills go obsolete when the base model catches up;
-preference skills drift. Standing rule: new model, re-run your evals.
-Sources: anthropics/skills skill-creator; tessl.io "Anthropic brings evals to skill-creator".
--->
-
----
-
-<div class="absolute inset-0 flex flex-col items-center justify-center px-20 text-center">
-  <h1 class="!text-[10rem] !leading-none !font-bold !tracking-[0.08em] !m-0 !text-[var(--p-fg)]">DEMO</h1>
-</div>
-
-<!--
-The live demo block, at the end where the whole story comes together. Three beats:
-(1) apm install wiring everything into .claude/; (2) the money shot — the LSP squiggle in
-demo/pulumi-ts, the golden-path skill triggering off a plain request, the hook holding
-`pulumi up`; (3) incident-triage on the crashlooping payments pod. Run what time allows;
-PRESENTER.md has the beats and the cut order.
+- this answers Ravi's R1 question: "how do you TEST a skill"
+- eval case = realistic prompt + assertions · blind A/B skill vs no-skill
+- kicker: new model → re-run evals (capability skills go obsolete, preference skills drift)
 -->
 
 ---
@@ -1256,8 +1412,4 @@ PRESENTER.md has the beats and the cut order.
   </div>
 </div>
 
-<!--
-Thank you. Scan to connect with Engin or Adam on LinkedIn, grab the workshop repo (slides +
-chapters + the skills we built), and the Pulumi AI/skills docs. Then go capture your next runbook.
--->
 

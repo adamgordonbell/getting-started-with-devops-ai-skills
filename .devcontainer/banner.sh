@@ -7,7 +7,7 @@ cat <<'BANNER'
   └────────────────────────────────────────────────────────────────┘
 
   Agents & tools installed:  Claude Code · Codex · Pulumi · APM
-                             Node · Python · Go · kubectl · helm · kind
+                             Node · Python · Go · kubectl · helm · kind · k9s
 
   1. Authenticate an agent:
        claude          # OAuth (port 19999 is forwarded), or set ANTHROPIC_API_KEY
@@ -20,5 +20,6 @@ cat <<'BANNER'
   3. Run the deck:            cd slides && npm run dev     (port 3030)
      Incident demo cluster:   demo/setup-cluster.sh
      Work the chapters:       chapters/00-introduction/
+     Resume a session:        cc-pick
 
 BANNER

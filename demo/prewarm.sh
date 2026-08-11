@@ -31,6 +31,15 @@ done
 step "LSP demo project deps (so types resolve live)"
 ( cd "$HERE/pulumi-ts" && npm install --silent ) && { note "ok"; ok=$((ok+1)); } || { note "WARN — npm install in demo/pulumi-ts failed"; warn=$((warn+1)); }
 
+step "no leftovers from a prior chapter-10 run?"
+# extracted-skills/ is gitignored scratch from skill-creator; a stale copy makes the
+# live extraction say "already exists" instead of doing the work.
+if [ -d "$HERE/../extracted-skills" ]; then
+  rm -rf "$HERE/../extracted-skills" && note "ok — removed stale extracted-skills/"
+else
+  note "ok"
+fi
+
 step "kind available for the incident-triage demo?"
 command -v kind >/dev/null 2>&1 && note "ok — run demo/setup-cluster.sh" || note "WARN — kind missing; skip the live cluster or use a recording"
 
