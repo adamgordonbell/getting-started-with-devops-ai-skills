@@ -1356,6 +1356,44 @@ scripts/gather-diagnostics.sh <ns> <workload>
 
 ---
 
+# You used the whole Pulumi stack today
+
+<div class="grid grid-cols-[auto_1fr] gap-x-10 gap-y-4 mt-6 items-baseline pulumi-stack">
+  <div v-click class="ps-name">Agent Skills</div>
+  <p v-click="1" class="ps-what">The skills <code>apm install</code> wired in — <code>pulumi/agent-skills</code>, open to your contributions</p>
+  <div v-click class="ps-name">MCP server</div>
+  <p v-click="2" class="ps-what">Registry, validation, Pulumi Cloud — governed live access; the agent never holds creds</p>
+  <div v-click class="ps-name">ESC</div>
+  <p v-click="3" class="ps-what">Where golden-path put the config — OIDC, no static secrets anywhere the agent can reach</p>
+  <div v-click class="ps-name">Cloud policy</div>
+  <p v-click="4" class="ps-what">The real wall behind the hook — deployment policies + short-lived scoped creds</p>
+  <div v-click class="ps-name">Neo</div>
+  <p v-click="5" class="ps-what">Hand off whole jobs — RBAC + human approval. <span class="hl">And Neo runs Agent Skills:</span> the skill you watched get born teaches it too</p>
+</div>
+
+<p v-click class="!mt-9 !text-[1.9rem] !leading-relaxed">
+  <span class="hl">Same skills, every agent — including the autonomous one.</span>
+  <span class="opacity-70">pulumi.com/docs/ai</span>
+</p>
+
+<style scoped>
+.ps-name {
+  font-weight: 700;
+  font-size: 1.55rem;
+  color: var(--p-primary);
+  white-space: nowrap;
+}
+.ps-what { margin: 0; font-size: 1.25rem; line-height: 1.45; }
+</style>
+
+<!--
+- not a pitch — a map of what they WATCHED, product by product
+- kicker: Neo speaks Agent Skills (pulumi/agent-skills README: accepted skills work in Neo)
+  → today's loop also upgrades the autonomous agent
+-->
+
+---
+
 <div class="absolute inset-0 flex flex-col justify-center items-center px-20">
   <div class="opacity-80 tracking-[0.6em] uppercase !text-[1.6rem] !mb-4 text-[var(--p-fg-muted)]">Thank you</div>
   <h1 class="!text-[4.5rem] !leading-[1.02] !font-semibold !tracking-tight !mb-16 text-center">
