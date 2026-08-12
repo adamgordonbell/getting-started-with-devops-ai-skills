@@ -99,7 +99,7 @@ The deck's speaker notes add up to roughly 26 minutes of talking against a 41-mi
 window. The slack is for the "questions any time" promise in housekeeping. If the room is
 chatty, defend minute 41: the demo block is what flexes, and the cut list decides what goes.
 
-## Beat 0 — mid-deck: skills come from sessions (~5 min, at the "Anatomy" slide)
+## Beat 0 [slide 11] — mid-deck: skills come from sessions (~5 min, at the "Anatomy" slide)
 
 The one demo that does NOT wait for the demo block. The "Anatomy of a complex skill"
 slide carries a **DEMO band** linking to the real PR, and the next slide ("Skills come
@@ -129,7 +129,7 @@ Beats 1–2 now run **inline** at their carrier slides (see table above); beats 
 end block at the DEMO slide. Each beat still happens *after* its slide — the slide is the
 setup, the demo is the payoff.
 
-### Beat 1 — wire it up: `apm install` (~3 min, at "One manifest → every agent")
+### Beat 1 [slide 22] — wire it up: `apm install` (~3 min, band on "APM: package.json")
 
 1. Show `apm.yml` in the editor. Point at the three dependency kinds (skills, MCP, LSP)
    and say the fourth out loud: hooks are file-discovered from `.apm/hooks/`.
@@ -141,7 +141,7 @@ Callback: "One manifest → every agent." A new teammate gets all of this from
 `git clone && apm install`.
 Fallback: run nothing. Prewarm already put the tree on disk; walk it in the editor.
 
-### Beat 2 — the money shot (~7 min, at "Same prompt, configured vs not") — **protect this**
+### Beat 2 [slide 29] — the money shot (~7 min, at "Same prompt, configured vs not") — **protect this**
 
 This is a **sequenced composite of three artifacts**, not one magic prompt. Run them in
 this order, narrate "off vs on," and don't imply one keystroke triggers all three.
@@ -171,7 +171,7 @@ deployment policy plus OIDC-scoped creds.
 Callbacks: the "LSP", "Hooks", "Same prompt, configured vs not", and "Use it" slides.
 Fallback: open the step's prerun in cc-pick/ccview and narrate it.
 
-### Beat 3 — a complex skill under pressure: `incident-triage` (~4 min, final click on "Use it")
+### Beat 3 [slide 30] — a complex skill under pressure: `incident-triage` (~4 min, final click on "Use it")
 
 1. Prompt: *"We have a prod incident: the `payments` pods are in CrashLoopBackOff in the
    `demo` namespace. Triage it — gather diagnostics, classify severity, and propose a
