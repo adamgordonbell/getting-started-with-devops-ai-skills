@@ -1372,8 +1372,7 @@ scripts/gather-diagnostics.sh <ns> <workload>
 </div>
 
 <p v-click class="!mt-9 !text-[1.9rem] !leading-relaxed">
-  <span class="hl">Same skills, every agent — including the autonomous one.</span>
-  <span class="opacity-70">pulumi.com/docs/ai</span>
+  <span class="hl">Same skills, every agent — including the autonomous one.</span>&ensp;<span class="opacity-70">pulumi.com/docs/ai&ensp;·&ensp;app.pulumi.com/signup</span>
 </p>
 
 <style scoped>
