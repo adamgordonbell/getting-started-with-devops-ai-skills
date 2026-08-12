@@ -1390,6 +1390,10 @@ scripts/gather-diagnostics.sh <ns> <workload>
 - not a pitch — a map of what they WATCHED, product by product
 - kicker: Neo speaks Agent Skills (pulumi/agent-skills README: accepted skills work in Neo)
   → today's loop also upgrades the autonomous agent
+- if asked "can I give Neo MY skill?": not first-class yet — Neo's catalog is the curated
+  pulumi/agent-skills one. Two paths: (1) Neo clones your repo + reads AGENTS.md, so point
+  AGENTS.md at the same SKILL.md your other agents use; (2) PR it upstream — accepted = in
+  Neo's catalog for everyone. Say "teaches it too" as the upstream path, not drag-and-drop.
 -->
 
 ---
